@@ -1,1 +1,152 @@
-"Hello World" 
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8' />
+		<title>F+S find a home!</title>
+		
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="0" />
+		
+		<script src='jquery-3.4.1.min.js'></script>
+		
+		<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />		
+		<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+		<script src='geo.js'></script>
+		<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+		<style>
+			body { margin:0; padding:0; }
+			#map { position:absolute; top:0; bottom:0; width:100%; }
+		</style>
+		
+		<link rel="icon" href="http://icons.iconarchive.com/icons/awicons/vista-artistic/128/2-Hot-Home-icon.png">
+		<link rel="shortcut icon" href="http://icons.iconarchive.com/icons/awicons/vista-artistic/128/2-Hot-Home-icon.png">
+		
+	</head>
+	<body>
+		 
+		<div id='map'></div>
+		<script>
+			mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY2VsbG9zYXZhcmVzZSIsImEiOiJjamthMHNnY2UwMmpnM3hwYW9xOTdtbHpqIn0.uN2ukoNn6XH5yCzIPNOa5Q';
+			
+			var popup = new mapboxgl.Popup({
+//				closeButton: false
+			});
+
+			var map = new mapboxgl.Map({
+				container: 'map',
+				style: 'mapbox://styles/ffabbri661/cjwi0sqka0gp41cqte4j4c6bg',
+				zoom: 12,
+				center: [9.1815, 45.4773],				
+				pitch: 60
+			});
+			 
+			map.on('load', function () {				
+				map.addLayer({
+					'id': '3d-buildings',
+					'source': 'composite',
+					'source-layer': 'building',
+					'filter': ['==', 'extrude', 'true'],
+					'type': 'fill-extrusion',
+					'minzoom': 15,
+					'paint': {
+						'fill-extrusion-color': '#aaa',
+						'fill-extrusion-height': [
+							"interpolate", ["linear"], ["zoom"],
+							15, 0,
+							15.05, ["get", "height"]
+							],
+							'fill-extrusion-base': [
+							"interpolate", ["linear"], ["zoom"],
+							15, 0,
+							15.05, ["get", "min_height"]
+						],
+						'fill-extrusion-opacity': .6
+					}
+				});
+				
+				map.addSource('fhf', {
+					"type": "geojson",
+					"data": geojson
+				});
+
+				map.addLayer({
+					'id': 'properties',
+					'type': 'circle',
+					'source': 'fhf',
+					'paint': {
+						'circle-radius': {
+							'base': 5,
+							'stops': [[12, 5], [14, 8], [22, 180]]
+						},
+						"circle-color": [
+							'interpolate',
+							['linear'],
+							['get', 'prmq'],
+							1000, 'green',
+							2500, 'yellow',
+							5000, 'red'
+						],
+					}
+				});
+				
+				map.addLayer({
+					'id': 'properties-txt',
+					'type': 'symbol',
+					'source': 'fhf',
+					'layout': {
+						'text-field': ['get', 'isNew'],
+						'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+						'text-size': 10,
+						'text-offset': [1.5, 0]
+					},
+					'paint': {
+						'text-color': 'rgb(0,0,0)',
+					}
+				});
+			});
+			
+			map.on('click', 'properties', function (e) {
+				var feature = e.features[0];
+				
+				var poptxt = '';
+				for (var p in feature.properties) {
+					if (p == 'url')
+						poptxt += p + ': <a href="#" onclick="window.open(\'' + feature.properties[p] + '\', \'_blank\').focus();">' + feature.properties[p] + '</a><br/>';
+					else if (p.match(/prmq_d/))
+						poptxt += p + ': ' + (feature.properties[p]*100).toFixed(2) + '%<br/>';
+					else if (p.match(/prmq/))
+						poptxt += p + ': ' + Math.round(feature.properties[p]) + '<br/>';
+					else if (p.match(/isNew/) || p.match(/lastSeen/))
+						poptxt += ''
+					else
+						poptxt = poptxt + p + ': ' + feature.properties[p] + '<br/>';
+				}
+				
+				popup.setLngLat(e.lngLat)
+					.setHTML(poptxt)
+					.addTo(map);
+			});
+			
+			map.on('mouseenter', 'properties', function(e) {
+				map.getCanvas().style.cursor = 'pointer';
+			});
+ 
+			map.on('mouseleave', 'properties', function() {
+				map.getCanvas().style.cursor = '';
+			});
+			
+			tsMax = null;
+			for (var i in geojson.features) {
+				if (tsMax == null || geojson.features[i].properties.lastSeen > tsMax)
+					tsMax = geojson.features[i].properties.lastSeen;
+			}
+			
+			setInterval(function () {
+				$('.mapboxgl-ctrl-bottom-left').html(tsMax);
+				$('.mapboxgl-ctrl-bottom-right').hide();
+			}, 1000);
+		</script>
+	 
+	</body>
+</html>
