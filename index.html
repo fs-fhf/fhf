@@ -22,13 +22,47 @@
 		<link rel="icon" href="http://icons.iconarchive.com/icons/awicons/vista-artistic/128/2-Hot-Home-icon.png">
 		<link rel="shortcut icon" href="http://icons.iconarchive.com/icons/awicons/vista-artistic/128/2-Hot-Home-icon.png">
 		
+		<script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/6.3.3/firebase-firestore.js"></script>
+		<script>
+			firebase.initializeApp({
+				apiKey: 'AIzaSyBeSNUtcMLie-J7-WNrReZyf6UiSkOUF8E',
+				projectId: 'fs-find-a-home'
+			});
+
+			var db = firebase.firestore();
+			
+			db.collection('prop-visibility').get().then((querySnapshot) => {
+				querySnapshot.forEach((doc) => {
+					var d = doc.data();
+					
+					for (var i in geojson.features) {
+						if (geojson.features[i].properties.url == d.url) {
+							geojson.features[i].properties.hide = 1;
+							break;
+						}
+					}
+				});
+			});
+			
+			function hide(url) {
+				db.collection('prop-visibility').add({
+					url: url,
+					hide: 1
+				})
+				.then(function(docRef) {
+					location.reload();
+				});				
+			}
+		</script>
+		
 	</head>
 	<body>
 		 
 		<div id='map'></div>
 		<script>
 			mapboxgl.accessToken = 'pk.eyJ1IjoibWFyY2VsbG9zYXZhcmVzZSIsImEiOiJjamthMHNnY2UwMmpnM3hwYW9xOTdtbHpqIn0.uN2ukoNn6XH5yCzIPNOa5Q';
-			
+						
 			var popup = new mapboxgl.Popup({
 //				closeButton: false
 			});
@@ -79,13 +113,19 @@
 							'base': 5,
 							'stops': [[12, 5], [14, 8], [22, 180]]
 						},
-						"circle-color": [
+						'circle-color': [
 							'interpolate',
 							['linear'],
 							['get', 'prmq'],
 							1000, 'green',
 							2500, 'yellow',
 							5000, 'red'
+						],
+						'circle-opacity': [
+							'match',
+							['get', 'hide'],
+							1, 0,
+							1
 						],
 					}
 				});
@@ -117,10 +157,14 @@
 						poptxt += p + ': ' + (feature.properties[p]*100).toFixed(2) + '%<br/>';
 					else if (p.match(/prmq/))
 						poptxt += p + ': ' + Math.round(feature.properties[p]) + '<br/>';
-					else if (p.match(/isNew/) || p.match(/lastSeen/))
+					else if (p.match(/isNew/) || p.match(/lastSeen/) || p.match(/hide/))
 						poptxt += ''
 					else
 						poptxt = poptxt + p + ': ' + feature.properties[p] + '<br/>';
+				}
+				
+				if (feature.properties.hide != 1) {
+					poptxt += '<br/><a href="#" onclick="hide(\'' + feature.properties.url + '\');">[Hide]</a>';
 				}
 				
 				popup.setLngLat(e.lngLat)
