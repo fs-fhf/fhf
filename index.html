@@ -162,6 +162,7 @@
 					map.on('click', 'properties', function (e) {
 						var feature = e.features[0];
 						
+						/*
 						var poptxt = '';
 						for (var p in feature.properties) {
 							if (p == 'url')
@@ -175,14 +176,16 @@
 							else
 								poptxt = poptxt + p + ': ' + feature.properties[p] + '<br/>';
 						}
+						*/
 
 						var poptxt = '';
-						poptxt += feature.properties['su'] + ' mq | ' + feature.properties['loc'] + ' locali | ' + ' piano ' + feature.properties['level'] + '/' + feature.properties['levelMax'] + '</br>';
-						poptxt += Math.round(feature.properties['pr']/1000) + ' k€ | ' + Math.round(feature.properties['prmq']) + ' €/mq (' + (feature.properties['prmq_d100_r'] > 0 ? '+' : '') + (feature.properties['prmq_d100_r']*100).toFixed(1) + '% 100mt / ' + (feature.properties['prmq_d500_r'] > 0 ? '+' : '') + (feature.properties['prmq_d500_r']*100).toFixed(1) + '% 500mt' + ')' + '</br>';
-						poptxt += feature.properties['dist'] + '</br>';
+						poptxt += feature.properties['su'] + ' mq | ' + feature.properties['loc'] + ' locali | ' + ' piano ' + feature.properties['level'] + '/' + feature.properties['levelMax'] + '<br/>';
+						poptxt += Math.round(feature.properties['pr']/1000) + ' k€ | ' + Math.round(feature.properties['prmq']) + ' €/mq (' + (feature.properties['prmq_d100_r'] > 0 ? '+' : '') + (feature.properties['prmq_d100_r']*100).toFixed(1) + '% 100mt / ' + (feature.properties['prmq_d500_r'] > 0 ? '+' : '') + (feature.properties['prmq_d500_r']*100).toFixed(1) + '% 500mt' + ') | ' + feature.properties['daysOnSale'] + ' days' '<br/>';
+						poptxt += feature.properties['dist'] + '<br/>';
 
+						poptxt += '<br/><a href="#" onclick="window.open(\'' + feature.properties['url'] + '\', \'_blank\').focus();">[Open]</a><br/>';
 						if (feature.properties.hide != 1) {
-							poptxt += '<br/><a href="#" onclick="hide(\'' + feature.properties.url + '\');">[Hide]</a>';
+							poptxt += '  <a href="#" onclick="hide(\'' + feature.properties.url + '\');">[Hide]</a>';
 						}
 						
 						popup.setLngLat(e.lngLat)
