@@ -175,6 +175,10 @@
 							else
 								poptxt = poptxt + p + ': ' + feature.properties[p] + '<br/>';
 						}
+
+						var poptxt = '';
+						poptxt += feature.properties['loc'] + ' locali, ' + feature.properties['su'] + 'mq, piano ' + feature.properties['level'] + '/' + feature.properties['levelMax'] + '</br>'
+						poptxt += feature.properties['loc'] + ' locali, ' + feature.properties['su'] + 'mq, piano ' + feature.properties['level'] + '/' + feature.properties['levelMax'] + '</br>'
 						
 						if (feature.properties.hide != 1) {
 							poptxt += '<br/><a href="#" onclick="hide(\'' + feature.properties.url + '\');">[Hide]</a>';
