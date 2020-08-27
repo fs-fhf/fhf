@@ -177,9 +177,10 @@
 						}
 
 						var poptxt = '';
-						poptxt += feature.properties['loc'] + ' locali, ' + feature.properties['su'] + 'mq, piano ' + feature.properties['level'] + '/' + feature.properties['levelMax'] + '</br>'
-						poptxt += feature.properties['loc'] + ' locali, ' + feature.properties['su'] + 'mq, piano ' + feature.properties['level'] + '/' + feature.properties['levelMax'] + '</br>'
-						
+						poptxt += feature.properties['loc'] + ' locali / ' + feature.properties['su'] + 'mq, piano ' + feature.properties['level'] + '/' + feature.properties['levelMax'] + '</br>';
+						poptxt += Math.round(feature.properties['pr']/1000) + 'k€ (' + Math.round(feature.properties['prmq']) + '€/mq ' + (feature.properties['prmq_d100_r'] > 0 ? '+' : '') + (feature.properties['prmq_d100_r']*100).toFixed(1) + ' 100mt ' + (feature.properties['prmq_d500_r'] > 0 ? '+' : '') + (feature.properties['prmq_d500_r']*100).toFixed(1) + ' 500mt' + ')' + '</br>';
+						poptxt += feature.properties['dist'] + '</br>';
+
 						if (feature.properties.hide != 1) {
 							poptxt += '<br/><a href="#" onclick="hide(\'' + feature.properties.url + '\');">[Hide]</a>';
 						}
