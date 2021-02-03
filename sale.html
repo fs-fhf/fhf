@@ -13,8 +13,8 @@
 		<script src='geo_sale.js'></script>
 		<script>
 			for (var i in geojson.features) {
-				for (var k in geojson.features[i].properties['_']) {
-					geojson.features[i].properties[k] = geojson.features[i].properties['_'][k];
+				for (var k in geojson.features[i].properties['_p']) {
+					geojson.features[i].properties[k] = geojson.features[i].properties['_p'][k];
 				}
 			}
 			//console.log(geojson);
@@ -170,17 +170,24 @@
 					
 					map.on('click', 'properties', function (e) {
 						const p = e.features[0].properties;
-						p['daysOnSale'] = Math.round((new Date()-Date.parse( JSON.parse(p.tsPublish)['$date'] ))/(1000*60*60*24));
-						console.log(p);						
+						p['daysOnSale'] = Math.round((new Date()-Date.parse( JSON.parse(p.tsPublish)['date'] ))/(1000*60*60*24));
+						console.log(p);	
+
+						const bnch = JSON.parse(p.bnch);
+						var bnchs = [];
+						for (var i in bnch) {
+							bnchs.push((bnch[i].BNCH_RATIO > 0 ? '+' : '') + (bnch[i].BNCH_RATIO*100).toFixed(1)+ '% ' + bnch[i].DIST + 'mt');
+						}
 						
 						var poptxt = '';
-						poptxt += p.sf + ' mq | ' + p.rooms + ' locali | ' + ' piano ' + p.lvl + '/' + p.lvlMax + '<br/>';
-						poptxt += Math.round(p.pr) + ' € | ' + Math.round(p.prmq) + ' €/mq (' + (p['prmq_d100_r'] > 0 ? '+' : '') + (p['prmq_d100_r']*100).toFixed(1) + '% 100mt / ' + (p['prmq_d500_r'] > 0 ? '+' : '') + (p['prmq_d500_r']*100).toFixed(1) + '% 500mt' + ') | ' + p['daysOnSale'] + ' days' + '<br/>';
+						poptxt += p.sf + ' mq | ' + p.rooms + ' locali | ' + 'piano ' + p.lvl + '/' + p.lvlMax + '<br/>';
+						poptxt += Math.round(p.pr) + ' € | ' + Math.round(p.prmq) + ' €/mq ' + (bnchs.length>0 ? '(' + bnchs.join(' / ') + ') ' : '') + '| ' + p['daysOnSale'] + ' days' + '<br/>';
 						poptxt += p['dist'] + '<br/>';
 						
+						const pics = p.photos.split(';');
 						for (var i=0; i<4; i++) {
-							if (i >= JSON.parse(p.photos).length) break;
-							poptxt += '<img src="' + JSON.parse(p.photos)[i] + '" width="100px" />'
+							if (i >= pics.length) break;
+							poptxt += '<img src="' + pics[i] + '" width="100px" />'
 						}
 
 						poptxt += '<br/><a href="#" onclick="window.open(\'' + p.url + '\', \'_blank\').focus();">[Open]</a>';
@@ -205,8 +212,8 @@
 			
 			tsMax = null;
 			for (var i in geojson.features) {
-				if (tsMax == null || new Date(geojson.features[i].properties._lastRun.$date) > tsMax)
-					tsMax = new Date(geojson.features[i].properties._lastRun.$date);
+				if (tsMax == null || new Date(geojson.features[i].properties._lastRun) > tsMax)
+					tsMax = new Date(geojson.features[i].properties._lastRun);
 			}
 			
 			setInterval(function () {
