@@ -14,7 +14,8 @@
 		<script>
 			for (var i in geojson.features) {
 				for (var k in geojson.features[i].properties['_p']) {
-					geojson.features[i].properties[k] = geojson.features[i].properties['_p'][k];
+					if (geojson.features[i].properties[k] == null) 
+						geojson.features[i].properties[k] = geojson.features[i].properties['_p'][k];
 				}
 			}
 			//console.log(geojson);
