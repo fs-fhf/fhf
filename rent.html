@@ -128,6 +128,25 @@
 						});
 
 						map.addLayer({
+							'id': 'circle-bkg',
+							'type': 'circle',
+							'source': 'fhf',
+							'paint': {
+								'circle-radius': {
+									'base': 7,
+									'stops': [[12, 7], [14, 10], [22, 200]]
+								},
+								'circle-color': 'Black',
+								'circle-opacity': [
+									'match',
+									['get', 'is_new'],
+									'0', 0,
+									1
+								],
+							}
+						});
+
+						map.addLayer({
 							'id': 'properties',
 							'type': 'circle',
 							'source': 'fhf',
@@ -150,21 +169,6 @@
 									1, 0,
 									1
 								],
-							}
-						});
-						
-						map.addLayer({
-							'id': 'properties-txt',
-							'type': 'symbol',
-							'source': 'fhf',
-							'layout': {
-								'text-field': ['get', 'isNew'],
-								'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-								'text-size': 10,
-								'text-offset': [1.5, 0]
-							},
-							'paint': {
-								'text-color': 'rgb(0,0,0)',
 							}
 						});
 					});
