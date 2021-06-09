@@ -175,7 +175,9 @@
 					
 					map.on('click', 'properties', function (e) {
 						const p = e.features[0].properties;
-						p['daysOnSale'] = Math.round((new Date()-Date.parse( JSON.parse(p.tsPublish)['date'] ))/(1000*60*60*24));
+
+						try { p['daysOnSale'] = Math.round((new Date()-Date.parse( JSON.parse(p.tsPublish)['date'] ))/(1000*60*60*24)); }
+						catch (exx) { p['daysOnSale'] = null; }
 						console.log(p);	
 
 						const bnch = JSON.parse(p.bnch);
