@@ -175,10 +175,10 @@
 					
 					map.on('click', 'properties', function (e) {
 						const p = e.features[0].properties;
+						console.log(p);	
 
 						try { p['daysOnSale'] = Math.round((new Date()-Date.parse( JSON.parse(p.tsPublish)['date'] ))/(1000*60*60*24)); }
 						catch (exx) { p['daysOnSale'] = null; }
-						console.log(p);	
 
 						const bnch = JSON.parse(p.bnch);
 						var bnchs = [];
@@ -194,7 +194,7 @@
 						const pics = p.photos.split(';');
 						for (var i=0; i<6; i++) {
 							if (i >= pics.length) break;
-							poptxt += '<img src="' + pics[i] + '" width="100px" />'
+							poptxt += '<img src="' + pics[i].replace(/\/\//g, '/').replace(':/', '://') + '" width="100px" />'
 						}
 
 						poptxt += '<br/><a href="#" onclick="window.open(\'' + p.url + '\', \'_blank\').focus();">[Open]</a>';
